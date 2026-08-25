@@ -49,18 +49,38 @@ struct ContentView: View {
         panel.canChooseDirectories = false
         panel.canChooseFiles = true
 
-        if panel.runModal() == .OK, let url = panel.url {
-            if let bundle = Bundle(url: url), let bundleId = bundle.bundleIdentifier {
-                let name = (bundle.infoDictionary?["CFBundleDisplayName"] as? String)
-                    ?? (bundle.infoDictionary?["CFBundleName"] as? String)
-                    ?? url.deletingPathExtension().lastPathComponent
-                appState.games[bundleId] = name
-            }
+        let result = panel.runModal()
+        guard result == .OK, let url = panel.url else {
+            return // cancelled, nothing to report
         }
+
+        guard let bundle = Bundle(url: url) else {
+            showAlert("Failed to load bundle at \(url.path)")
+            return
+        }
+
+        guard let bundleId = bundle.bundleIdentifier else {
+            showAlert("No bundle identifier found for \(url.lastPathComponent).\nInfo: \(bundle.infoDictionary?.keys.joined(separator: ", ") ?? "none")")
+            return
+        }
+
+        let name = (bundle.infoDictionary?["CFBundleDisplayName"] as? String)
+            ?? (bundle.infoDictionary?["CFBundleName"] as? String)
+            ?? url.deletingPathExtension().lastPathComponent
+
+        appState.games[bundleId] = name
+    }
+
+    func showAlert(_ message: String) {
+        let alert = NSAlert()
+        alert.messageText = "Add Application"
+        alert.informativeText = message
+        alert.runModal()
     }
 
     func removeApp(_ key: String) {
         appState.games.removeValue(forKey: key)
         appState.activegames.removeValue(forKey: key)
+        showAlert("\"\(appState.games[key] ?? "Unknown")\" Application removed.")
     }
 }
