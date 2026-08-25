@@ -1,11 +1,8 @@
 #!/bin/sh
 set -e
 
-# get version tag or commit id
-VERSION=$(git describe HEAD)
-
 # set app version
-agvtool new-version ${VERSION:1}
+agvtool new-version 1.0.0
 
 # build
 xcodebuild -quiet -configuration Release -target Mouselock
