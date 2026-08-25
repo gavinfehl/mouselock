@@ -15,9 +15,12 @@ struct mouselockApp: App {
 class AppState: ObservableObject {
     static let shared = AppState();
     
-    @Published var games: Dictionary<String, String> = [
-        "com.riotgames.LeagueofLegends.GameClient": "1/League of Legends"
-    ];
+    @Published var games: Dictionary<String, String> = UserDefaults.standard.dictionary(forKey: "games") as? [String: String] ?? [
+        "com.riotgames.LeagueofLegends.GameClient": "League of Legends (In-Game)",
+        "com.riotgames.LeagueofLegends.LeagueClientUx": "League of Legends (Client)",
+    ] {
+        didSet { UserDefaults.standard.set(self.games, forKey: "games") }
+    };
     
     @Published var width: String = UserDefaults.standard.string(forKey: "width") ?? "1920" {
         didSet {UserDefaults.standard.set(self.width, forKey: "width")}
@@ -28,9 +31,15 @@ class AppState: ObservableObject {
     @Published var active: Bool = UserDefaults.standard.bool(forKey: "active") {
         didSet {UserDefaults.standard.set(self.active, forKey: "active")}
     };
-    @Published var activegames: Dictionary<String, Bool> = UserDefaults.standard.dictionary(forKey: "activegames") as? [String: Bool] ?? [:] {
-        didSet {UserDefaults.standard.set(self.activegames, forKey: "activegames")}
-    };
+    @Published var activegames: [String: Bool] =
+        UserDefaults.standard.dictionary(forKey: "activegames") as? [String: Bool] ?? [
+            "com.riotgames.LeagueofLegends.GameClient": true,
+            "com.riotgames.LeagueofLegends.LeagueClientUx": false
+        ] {
+        didSet {
+            UserDefaults.standard.set(self.activegames, forKey: "activegames")
+        }
+    }
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -57,7 +66,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
             
             // pause if not activated
-            if (AppState.shared.active == false && (AppState.shared.activegames[(NSWorkspace().frontmostApplication?.bundleIdentifier ?? "")] ?? false) == false) {
+            let frontmost = NSWorkspace.shared.frontmostApplication
+            let frontmostKey = frontmost?.bundleIdentifier ?? frontmost?.bundleURL?.path ?? ""
+            if (AppState.shared.active == false && (AppState.shared.activegames[frontmostKey] ?? false) == false) {
                 return;
             }
             
