@@ -51,7 +51,7 @@ struct ContentView: View {
 
         let result = panel.runModal()
         guard result == .OK, let url = panel.url else {
-            return // cancelled, nothing to report
+            return
         }
 
         guard let bundle = Bundle(url: url) else {
@@ -59,16 +59,14 @@ struct ContentView: View {
             return
         }
 
-        guard let bundleId = bundle.bundleIdentifier else {
-            showAlert("No bundle identifier found for \(url.lastPathComponent).\nInfo: \(bundle.infoDictionary?.keys.joined(separator: ", ") ?? "none")")
-            return
-        }
+        // fall back to file path as the key if there's no bundle identifier
+        let key = bundle.bundleIdentifier ?? url.path
 
         let name = (bundle.infoDictionary?["CFBundleDisplayName"] as? String)
             ?? (bundle.infoDictionary?["CFBundleName"] as? String)
             ?? url.deletingPathExtension().lastPathComponent
 
-        appState.games[bundleId] = name
+        appState.games[key] = name
     }
 
     func showAlert(_ message: String) {
