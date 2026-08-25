@@ -47,7 +47,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
         
-        NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged, .rightMouseDragged], handler: {(event: NSEvent) in
+        NSEvent.addGlobalMonitorForEvents(matching: [.mouseMoved, .leftMouseDragged, .rightMouseDragged, .otherMouseDragged], handler: {(event: NSEvent) in
             if (self.lastTime != 0) { // ignore old events
                 if (event.timestamp <= self.lastTime) {
                     self.lastDeltaX = 0;
