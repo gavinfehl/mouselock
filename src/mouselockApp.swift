@@ -16,7 +16,8 @@ class AppState: ObservableObject {
     static let shared = AppState();
     
     @Published var games: Dictionary<String, String> = UserDefaults.standard.dictionary(forKey: "games") as? [String: String] ?? [
-        "com.riotgames.LeagueofLegends.GameClient": "League of Legends"
+        "com.riotgames.LeagueofLegends.GameClient": "League of Legends (In-Game)",
+        "com.riotgames.LeagueofLegends.LeagueClientUx": "League of Legends (Client)",
     ] {
         didSet { UserDefaults.standard.set(self.games, forKey: "games") }
     };
@@ -30,9 +31,15 @@ class AppState: ObservableObject {
     @Published var active: Bool = UserDefaults.standard.bool(forKey: "active") {
         didSet {UserDefaults.standard.set(self.active, forKey: "active")}
     };
-    @Published var activegames: Dictionary<String, Bool> = UserDefaults.standard.dictionary(forKey: "activegames") as? [String: Bool] ?? [:] {
-        didSet {UserDefaults.standard.set(self.activegames, forKey: "activegames")}
-    };
+    @Published var activegames: [String: Bool] =
+        UserDefaults.standard.dictionary(forKey: "activegames") as? [String: Bool] ?? [
+            "com.riotgames.LeagueofLegends.GameClient": true,
+            "com.riotgames.LeagueofLegends.LeagueClientUx": false
+        ] {
+        didSet {
+            UserDefaults.standard.set(self.activegames, forKey: "activegames")
+        }
+    }
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {

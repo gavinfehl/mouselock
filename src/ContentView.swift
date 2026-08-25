@@ -59,15 +59,23 @@ struct ContentView: View {
             return
         }
 
-        // fall back to file path as the key if there's no bundle identifier
+        // Fall back to file path as the key if there's no bundle identifier
         let key = bundle.bundleIdentifier ?? url.path
 
-        let name = (bundle.infoDictionary?["CFBundleDisplayName"] as? String)
-            ?? (bundle.infoDictionary?["CFBundleName"] as? String)
-            ?? url.deletingPathExtension().lastPathComponent
+        let name: String
 
+        switch key {
+        case "com.riotgames.LeagueofLegends.LeagueClientUx":
+            name = "League of Legends (Client)"
+        case "com.riotgames.LeagueofLegends.GameClient":
+            name = "League of Legends (In-Game)"
+        default:
+            name = (bundle.infoDictionary?["CFBundleDisplayName"] as? String)
+                ?? (bundle.infoDictionary?["CFBundleName"] as? String)
+                ?? url.deletingPathExtension().lastPathComponent
+        }
         appState.games[key] = name
-    }
+
 
     func showAlert(_ message: String) {
         let alert = NSAlert()
@@ -79,6 +87,5 @@ struct ContentView: View {
     func removeApp(_ key: String) {
         appState.games.removeValue(forKey: key)
         appState.activegames.removeValue(forKey: key)
-        showAlert("\"\(appState.games[key] ?? "Unknown")\" Application removed.")
     }
 }
