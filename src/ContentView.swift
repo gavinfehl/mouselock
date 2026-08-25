@@ -75,7 +75,7 @@ struct ContentView: View {
                 ?? url.deletingPathExtension().lastPathComponent
         }
         appState.games[key] = name
-
+    }
 
     func showAlert(_ message: String) {
         let alert = NSAlert()
